@@ -3,7 +3,7 @@
 /***************************************************************
  * Extension Manager/Repository config file for ext "dropdown_sitemap".
  *
- * Auto generated 18-10-2013 10:44
+ * Auto generated 18-10-2013 10:45
  *
  * Manual updates:
  * Only the data in the array - everything else is removed by next
@@ -15,7 +15,7 @@ $EM_CONF[$_EXTKEY] = array (
 	'description' => 'The Drop-Down sitemap plugin adds a new kind of menu/sitemap to the T3 content elements. It uses HTML list elements, CSS and JS (Scriptaculous or Mootools) to generate a drop-down map of the website, with the possibility to expand/collapse every section.',
 	'category' => 'plugin',
 	'shy' => 0,
-	'version' => '3.0.0',
+	'version' => '3.0.1',
 	'dependencies' => '',
 	'conflicts' => '',
 	'priority' => '',
