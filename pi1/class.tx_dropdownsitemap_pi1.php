@@ -25,24 +25,28 @@
 	/**
 	 * Plugin 'Drop-Down sitemap' for the 'dropdown_sitemap' extension.
 	 *
-	 * @author		Jean-David Gadina (info@macmade.net) / macmade.net
-	 * @version		1.1.0
+	 * @author		Jean-David Gadina (macmade@gadlab.net)
+	 * @version		1.2.0
 	 */
 	
 	/**
 	 * [CLASS/FUNCTION INDEX OF SCRIPT]
 	 * 
 	 * SECTION:		1 - MAIN
-	 *      89:		function main($content,$conf)
-	 *     142:		function buildMenuConfArray
-	 *     214:		function buildImageTSConfig($expanded=false)
-	 *     261:		function buildJSCode
+	 *      96:		function main($content,$conf)
+	 *     162:		function setConfig
+	 *     193:		function buildMenuConfArray
+	 *     270:		function buildImageTSConfig($expanded=false)
+	 *     317:		function buildJSCode
 	 * 
-	 *				TOTAL FUNCTIONS: 4
+	 *				TOTAL FUNCTIONS: 5
 	 */
 	
 	// Typo3 FE plugin class
 	require_once(PATH_tslib."class.tslib_pibase.php");
+	
+	// Developer API class
+	require_once(t3lib_extMgm::extPath('api_macmade').'class.tx_apimacmade.php');
 	
 	class tx_dropdownsitemap_pi1 extends tslib_pibase {
 		
@@ -57,13 +61,16 @@
 		 ***************************************************************/
 		
 		// Same as class name
-		var $prefixId = "tx_dropdownsitemap_pi1";
+		var $prefixId = 'tx_dropdownsitemap_pi1';
 		
 		// Path to this script relative to the extension dir
-		var $scriptRelPath = "pi1/class.tx_dropdownsitemap_pi1.php";
+		var $scriptRelPath = 'pi1/class.tx_dropdownsitemap_pi1.php';
 		
 		// The extension key
-		var $extKey = "dropdown_sitemap";
+		var $extKey = 'dropdown_sitemap';
+		
+		// Version of the Developer API required
+		var $apimacmade_version = 1.8;
 		
 		
 		
@@ -88,11 +95,23 @@
 		 */
 		function main($content,$conf) {
 			
+			// New instance of the macmade.net API
+			$this->api = new tx_apimacmade($this);
+			
 			// Placing TS conf array in a class variable
 			$this->conf = $conf;
 			
 			// Load LOCAL_LANG values
 			$this->pi_loadLL();
+			
+			// Init flexform configuration of the plugin
+			$this->pi_initPIflexForm();
+			
+			// Store flexform informations
+			$this->piFlexForm = $this->cObj->data['pi_flexform'];
+			
+			// Set final configuration (TS or FF)
+			$this->setConfig();
 			
 			// Create the menu configuration array
 			$mconf = $this->buildMenuConfArray();
@@ -108,7 +127,7 @@
 			
 			// Use starting point field
 			// Thanks a lot to Steven Bagshaw for that piece of code
-			$startingPoint = $this->cObj->data['pages'];
+			$startingPoint = $this->conf['startingPoint'];
 			
 			// Class constructor
 			$menu->start($GLOBALS['TSFE']->tmpl,$GLOBALS['TSFE']->sys_page,$startingPoint,$mconf,1);
@@ -129,6 +148,38 @@
 			
 			// Return the full menu
 			return $this->pi_wrapInBaseClass(implode(chr(10),$content));
+		}
+		
+		/**
+		 * Set configuration array.
+		 * 
+		 * This function is used to set the final configuration array of the
+		 * plugin, by providing a mapping array between the TS & the flexform
+		 * configuration.
+		 * 
+		 * @return		Void
+		 */
+		function setConfig() {
+			
+			// Mapping array for PI flexform
+			$flex2conf = array(
+				'startingPoint' => 'sDEF:pages',
+				'excludeList' => 'sOPTIONS:exclude_pages',
+				'expAllLink' => 'sOPTIONS:expall',
+				'showLevels' => 'sOPTIONS:show_levels',
+				'expandLevels' => 'sOPTIONS:expand_levels',
+				'linkTarget' => 'sADVANCED:link_target',
+				'list.' => array(
+					'tag' => 'sADVANCED:list_tag',
+					'type' => 'sADVANCED:list_type',
+				),
+			);
+			
+			// Override TS setup with flexform
+			$this->conf = $this->api->fe_mergeTSconfFlex($flex2conf,$this->conf,$this->piFlexForm);
+			
+			// DEBUG ONLY - Output configuration array
+			#$this->api->debug($this->conf,'Drop-Down Site Map: configuration array');
 		}
 		
 		/**
@@ -163,7 +214,7 @@
 				$mconf[$i] = 'TMENU';
 				
 				// Wrap in an HTML list element
-				$mconf[$i . '.']['wrap'] = '<' . $this->conf['list.']['tag'] . ' type="' . $this->conf['list.']['style'] . '">|</' . $this->conf['list.']['tag'] . '>';
+				$mconf[$i . '.']['wrap'] = '<' . $this->conf['list.']['tag'] . ' type="' . $this->conf['list.']['type'] . '">|</' . $this->conf['list.']['tag'] . '>';
 				
 				// Expand all property
 				$mconf[$i . '.']['expAll'] = '1';
@@ -183,22 +234,27 @@
 				// Start wrap
 				$mconf[$i . '.']['NO.']['allWrap'] = '<li class="closed"><div class="level_' . $i . '">' . $this->cObj->IMAGE($imgTSConfig['NO']) . '|';
 				
-				// IFSUB state configuration
-				$mconf[$i . '.']['IFSUB.'] = array();
-				
-				// Enable UID field substitution
-				$mconf[$i . '.']['IFSUB.']['subst_elementUid'] = '1';
-				
-				// End wrap
-				$mconf[$i . '.']['IFSUB.']['wrapItemAndSub'] = '|</div></li>';
-				
-				// Start wrap
-				$mconf[$i . '.']['IFSUB.']['allWrap'] = '<li id="' . $this->prefixId . '_{elementUid}" class="' . $className . '"><div class="level_' . $i . '"><a href="javascript:' . $this->prefixId . '_swapClasses({elementUid});">' . $this->cObj->IMAGE($imgTSConfig['IFSUB']) . '</a>|';
-				
-				// IFSUB state activation
-				$mconf[$i . '.']['IFSUB'] = '1';
+				// Only check for subpages if sublevels must be shown
+				if ($i < $this->conf['showLevels']) {
+					
+					// IFSUB state configuration
+					$mconf[$i . '.']['IFSUB.'] = array();
+					
+					// Enable UID field substitution
+					$mconf[$i . '.']['IFSUB.']['subst_elementUid'] = '1';
+					
+					// End wrap
+					$mconf[$i . '.']['IFSUB.']['wrapItemAndSub'] = '|</div></li>';
+					
+					// Start wrap
+					$mconf[$i . '.']['IFSUB.']['allWrap'] = '<li id="' . $this->prefixId . '_{elementUid}" class="' . $className . '"><div class="level_' . $i . '"><a href="javascript:' . $this->prefixId . '_swapClasses({elementUid});">' . $this->cObj->IMAGE($imgTSConfig['IFSUB']) . '</a>|';
+					
+					// IFSUB state activation
+					$mconf[$i . '.']['IFSUB'] = '1';
+				}
 			}
 			
+			// Return configuration array
 			return $mconf;
 		}
 		
@@ -304,7 +360,7 @@
 	/**
 	 * XCLASS inclusion
 	 */
-	if (defined("TYPO3_MODE") && $TYPO3_CONF_VARS[TYPO3_MODE]["XCLASS"]["ext/dropdown_sitemap/pi1/class.tx_dropdownsitemap_pi1.php"])	{
+	if (defined("TYPO3_MODE") && $TYPO3_CONF_VARS[TYPO3_MODE]["XCLASS"]["ext/dropdown_sitemap/pi1/class.tx_dropdownsitemap_pi1.php"]) {
 		include_once($TYPO3_CONF_VARS[TYPO3_MODE]["XCLASS"]["ext/dropdown_sitemap/pi1/class.tx_dropdownsitemap_pi1.php"]);
 	}
 ?>

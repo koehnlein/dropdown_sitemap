@@ -76,6 +76,9 @@ plugin.tx_dropdownsitemap_pi1 {
 	
 	// Default CSS styling
 	_CSS_DEFAULT_STYLE (
+		.tx-dropdownsitemap-pi1 A {
+			font-weight: bold;
+		}
 		.tx-dropdownsitemap-pi1 LI.open OL {
 			display: block;
 		}
@@ -89,25 +92,30 @@ plugin.tx_dropdownsitemap_pi1 {
 			display: none;
 		}
 		.tx-dropdownsitemap-pi1 DIV {
-			border: solid 1px #666666;
-			background: #CED8E1;
+			border: solid 1px #DFE2E3;
+			background: #FAFBFB;
 			padding: 2px;
-			margin: 2px;
+			margin-bottom: 5px;
 		}
 		.tx-dropdownsitemap-pi1 DIV.level_2 {
 			background: #FFFFFF;
 		}
+		.tx-dropdownsitemap-pi1 DIV.level_2 A {
+			font-weight: normal;
+		}
 		.tx-dropdownsitemap-pi1 DIV.level_3 {
-			background: #D0E0CC;
+			background: #FAFBFB;
 		}
 		.tx-dropdownsitemap-pi1 DIV.level_4 {
 			background: #FFFFFF;
 		}
 		.tx-dropdownsitemap-pi1 DIV.level_5 {
-			background: #E0CCCC;
+			background: #FAFBFB;
 		}
 		.tx-dropdownsitemap-pi1 DIV.expAll {
 			text-align: center;
+			border: solid 1px #DFE2E3;
+			background: #FAFBFB;
 		}
 	)
 }

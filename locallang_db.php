@@ -7,34 +7,64 @@
 
 $LOCAL_LANG = Array (
 	'default' => Array (
-		'tt_content.menu_type_pi1' => 'Drop-Down sitemap',
+		'tt_content.list_type_pi1' => 'Drop-Down sitemap',
+		'tt_content.flexform_pi1.s_def' => 'Main',
+		'tt_content.flexform_pi1.s_options' => 'Options',
+		'tt_content.flexform_pi1.s_options.show_levels' => 'Levels to show',
+		'tt_content.flexform_pi1.s_options.expand_levels' => 'Levels to expand',
+		'tt_content.flexform_pi1.s_options.exclude_pages' => 'Exclude pages',
+		'tt_content.flexform_pi1.s_options.expall' => 'Expand all link',
+		'tt_content.flexform_pi1.s_options.expall.I.1' => 'Enable',
+		'tt_content.flexform_pi1.s_options.expall.I.2' => 'Disable',
+		'tt_content.flexform_pi1.s_advanced' => 'Advanced',
+		'tt_content.flexform_pi1.s_advanced.list_tag' => 'List tag',
+		'tt_content.flexform_pi1.s_advanced.list_tag.I.1' => 'Ordered list (OL)',
+		'tt_content.flexform_pi1.s_advanced.list_tag.I.2' => 'Unordered list (UL)',
+		'tt_content.flexform_pi1.s_advanced.list_type' => 'List type',
+		'tt_content.flexform_pi1.s_advanced.link_target' => 'Target for links',
+		'tt_content.flexform_pi1.LGL.default' => 'Default',
 	),
 	'dk' => Array (
 	),
 	'de' => Array (
-		'tt_content.menu_type_pi1' => 'Drop-Down Sitemap',
+		'tt_content.list_type_pi1' => 'Drop-Down Sitemap',
 	),
 	'no' => Array (
-		'tt_content.menu_type_pi1' => 'Drop-Down sidekart',
+		'tt_content.list_type_pi1' => 'Drop-Down sidekart',
 	),
 	'it' => Array (
 	),
 	'fr' => Array (
-		'tt_content.menu_type_pi1' => 'Plan du site déroulant',
+		'tt_content.list_type_pi1' => 'Plan du site déroulant',
+		'tt_content.flexform_pi1.s_def' => 'Général',
+		'tt_content.flexform_pi1.s_options' => 'Options',
+		'tt_content.flexform_pi1.s_options.show_levels' => 'Niveaux à afficher',
+		'tt_content.flexform_pi1.s_options.expand_levels' => 'Niveaux à étendre',
+		'tt_content.flexform_pi1.s_options.exclude_pages' => 'Pages à exclure',
+		'tt_content.flexform_pi1.s_options.expall' => 'Lien afficher tout',
+		'tt_content.flexform_pi1.s_options.expall.I.1' => 'Activer',
+		'tt_content.flexform_pi1.s_options.expall.I.2' => 'Dsactiver',
+		'tt_content.flexform_pi1.s_advanced' => 'Avancé',
+		'tt_content.flexform_pi1.s_advanced.list_tag' => 'Balise de liste',
+		'tt_content.flexform_pi1.s_advanced.list_tag.I.1' => 'Liste à numéro (OL)',
+		'tt_content.flexform_pi1.s_advanced.list_tag.I.2' => 'Liste à puce (UL)',
+		'tt_content.flexform_pi1.s_advanced.list_type' => 'Type de liste',
+		'tt_content.flexform_pi1.s_advanced.link_target' => 'Cible des liens',
+		'tt_content.flexform_pi1.LGL.default' => 'Par défaut',
 	),
 	'es' => Array (
 	),
 	'nl' => Array (
 	),
 	'cz' => Array (
-		'tt_content.menu_type_pi1' => 'Rozbalovací mapa webu',
+		'tt_content.list_type_pi1' => 'Rozbalovací mapa webu',
 	),
 	'pl' => Array (
 	),
 	'si' => Array (
 	),
 	'fi' => Array (
-		'tt_content.menu_type_pi1' => 'Drop-Down sivukartta',
+		'tt_content.list_type_pi1' => 'Drop-Down sivukartta',
 	),
 	'tr' => Array (
 	),
@@ -71,7 +101,7 @@ $LOCAL_LANG = Array (
 	'bg' => Array (
 	),
 	'br' => Array (
-		'tt_content.menu_type_pi1' => 'Mapa do Site "Drop-Down"',
+		'tt_content.list_type_pi1' => 'Mapa do Site "Drop-Down"',
 	),
 	'et' => Array (
 	),

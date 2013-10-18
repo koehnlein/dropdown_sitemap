@@ -1,40 +1,42 @@
 <?php
 	/**
-	 * Language labels for plugin "tx_dropdownsitemap_pi1"
+	 * Language labels for extension "dropdown_sitemap"
 	 * 
 	 * This file is detected by the translation tool.
 	 */
 
 $LOCAL_LANG = Array (
 	'default' => Array (
-		'expall' => 'Expand / Collapse all',
+		'pi1_title' => 'Drop-Down sitemap',
+		'pi1_plus_wiz_description' => 'Adds a drop-down sitemap to the page.',
 	),
 	'dk' => Array (
 	),
 	'de' => Array (
-		'expall' => 'Alles aus-/einklappen',
+		'pi1_title' => 'Drop-Down Sitemap',
 	),
 	'no' => Array (
+		'pi1_title' => 'Drop-Down sidekart',
 	),
 	'it' => Array (
-		'expall' => 'Tutto pubblicare / mascherare',
 	),
 	'fr' => Array (
-		'expall' => 'Tout afficher / masquer',
+		'pi1_title' => 'Plan du site déroulant',
+		'pi1_plus_wiz_description' => 'Ajoute un plan du site déroulant à la page.',
 	),
 	'es' => Array (
 	),
 	'nl' => Array (
 	),
 	'cz' => Array (
-		'expall' => 'Rozbalit / sbalit vše',
+		'pi1_title' => 'Rozbalovací mapa webu',
 	),
 	'pl' => Array (
 	),
 	'si' => Array (
 	),
 	'fi' => Array (
-		'expall' => 'Laajenna / Supista kaikki',
+		'pi1_title' => 'Drop-Down sivukartta',
 	),
 	'tr' => Array (
 	),
@@ -71,6 +73,7 @@ $LOCAL_LANG = Array (
 	'bg' => Array (
 	),
 	'br' => Array (
+		'pi1_title' => 'Mapa do Site "Drop-Down"',
 	),
 	'et' => Array (
 	),
