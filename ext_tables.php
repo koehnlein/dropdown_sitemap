@@ -3,6 +3,9 @@ if( !defined( 'TYPO3_MODE' ) ) {
     die( 'Access denied.' );
 }
 
+// Includes the TCA helper class
+require_once( t3lib_extMgm::extPath( $_EXTKEY ) . 'class.tx_dropdownsitemap_tca.php' );
+
 // Load content TCA
 t3lib_div::loadTCA( 'tt_content' );
 
@@ -27,8 +30,12 @@ t3lib_extMgm::addPlugin(
     'list_type'
 );
 
+// Static templates
+t3lib_extMgm::addStaticFile( $_EXTKEY, 'static/ts/', 'Drop-Down Site Map' );
+
 // Wizard icons
 if( TYPO3_MODE == 'BE' ) {
+    
     $TBE_MODULES_EXT[ 'xMOD_db_new_content_el' ][ 'addElClasses' ][ 'tx_dropdownsitemap_pi1_wizicon' ] = t3lib_extMgm::extPath( $_EXTKEY ) . 'pi1/class.tx_dropdownsitemap_pi1_wizicon.php';
 }
 ?>

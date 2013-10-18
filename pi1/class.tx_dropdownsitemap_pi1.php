@@ -26,7 +26,7 @@
  * Plugin 'Drop-Down sitemap' for the 'dropdown_sitemap' extension.
  *
  * @author      Jean-David Gadina (info@macmade.net)
- * @version     1.5.0
+ * @version     2.0.0
  */
 
 /**
@@ -34,10 +34,10 @@
  * 
  * SECTION:     1 - MAIN
  *      97:     function main($content,$conf)
- *     175:     function setConfig
- *     215:     function buildMenuConfArray
- *     354:     function buildImageTSConfig($expanded=false)
- *     403:     function buildJSCode
+ *     222:     function setConfig
+ *     267:     function buildMenuConfArray
+ *     463:     function buildImageTSConfig($expanded=false)
+ *     528:     function buildJSCode
  * 
  *              TOTAL FUNCTIONS: 5
  */
@@ -71,7 +71,7 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
     var $extKey             = 'dropdown_sitemap';
     
     // Version of the Developer API required
-    var $apimacmade_version = 1.8;
+    var $apimacmade_version = 4.2;
     
     
     
@@ -96,7 +96,6 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
      */
     function main( $content, $conf )
     {
-        
         // New instance of the macmade.net API
         $this->api  = new tx_apimacmade( $this );
         
@@ -112,8 +111,28 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         // Store flexform informations
         $this->piFlexForm = $this->cObj->data[ 'pi_flexform' ];
         
+        // Checks the configuration array
+        if( !is_array( $this->conf ) || count( $this->conf ) <= 2 ) {
+            
+            // Static template not included
+            return $this->api->fe_makeStyledContent(
+                'strong',
+                'error',
+                $this->pi_getLL( 'error' )
+            );
+        }
+        
         // Set final configuration (TS or FF)
         $this->setConfig();
+        
+        // Checks for Scriptaculous
+        if( isset( $this->conf[ 'scriptaculous.' ][ 'enable' ] )
+            && $this->conf[ 'scriptaculous.' ][ 'enable' ]
+        ) {
+            
+            // Includes Scriptaculous
+            $this->api->fe_includeScriptaculousJs();
+        }
         
         // Create the menu configuration array
         $mconf = $this->buildMenuConfArray();
@@ -147,11 +166,39 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         $content = array();
         
         // Display the expAll link
-        if( $this->conf[ 'expAllLink' ] == 1 ) {    
+        if( $this->conf[ 'expAllLink' ] == 1 ) {
+            
+            // Picture TS configuration array
+            $imgTSConfig                        = array();
+            
+            // File reference
+            $imgTSConfig[ 'file' ]              = $this->conf[ 'picture.' ][ 'expOn' ];
+            
+            // File ressource array
+            $imgTSConfig[ 'file.' ]             = array();
+            
+            // Width
+            $imgTSConfig[ 'file.' ][ 'width' ]  = $this->conf[ 'picture.' ][ 'width' ];
+            
+            // Height
+            $imgTSConfig[ 'file.' ][ 'height' ] = $this->conf[ 'picture.' ][ 'height' ];
+            
+            // HTML tag parameters
+            $imgTSConfig[ 'params' ]            = $this->conf[ 'picture.' ][ 'params' ]
+                                                . ' id="'
+                                                . $this->prefixId
+                                                . '_expImg"';
+            
+            // Adds the alt and title text
+            $imgTSConfig[ 'altText' ]           = $this->pi_getLL( 'expall' );
+            $imgTSConfig[ 'titleText' ]         = $this->pi_getLL( 'expall' );
             
             $content[] = '<div class="expAll"><a href="javascript:'
                        . $this->prefixId
-                       . '_expAll();">'
+                       . '_expAll();" title="'
+                       . $this->pi_getLL( 'expall' )
+                       . '">'
+                       . $this->cObj->IMAGE( $imgTSConfig )
                        . $this->pi_getLL( 'expall' )
                        . '</a></div>';
         }
@@ -174,22 +221,27 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
      */
     function setConfig()
     {
-        
         // Mapping array for PI flexform
         $flex2conf = array(
             'startingPoint'    => 'sDEF:pages',
-            'excludeList'      => 'sOPTIONS:exclude_pages',
-            'excludeDoktypes'  => 'sOPTIONS:exclude_doktypes',
-            'includeNotInMenu' => 'sOPTIONS:include_not_in_menu',
-            'showSpacers'      => 'sOPTIONS:show_spacers',
+            'excludeList'      => 'sPAGES:exclude_pages',
+            'excludeDoktypes'  => 'sPAGES:exclude_doktypes',
+            'includeNotInMenu' => 'sPAGES:include_not_in_menu',
+            'showSpacers'      => 'sPAGES:show_spacers',
             'expAllLink'       => 'sOPTIONS:expall',
             'showLevels'       => 'sOPTIONS:show_levels',
             'expandLevels'     => 'sOPTIONS:expand_levels',
+            'linkText'         => 'sOPTIONS:link_text',
             'descriptionField' => 'sOPTIONS:description_field',
             'linkTarget'       => 'sADVANCED:link_target',
             'list.'            => array(
                 'tag'  => 'sADVANCED:list_tag',
                 'type' => 'sADVANCED:list_type'
+            ),
+            'scriptaculous.'   => array(
+                'enable' => 'sEFFECTS:scriptaculous',
+                'appear' => 'sEFFECTS:appear',
+                'fade'   => 'sEFFECTS:fade'
             )
         );
         
@@ -214,7 +266,6 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
      */
     function buildMenuConfArray()
     {
-        
         // PID list storage
         $pidList = array();
         
@@ -239,17 +290,36 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
             // Create image TS Config
             $imgTSConfig                                      = ( $i <= $this->conf[ 'expandLevels' ] ) ? $this->buildImageTSConfig( 1 ) : $this->buildImageTSConfig();
             
-            // CSS class name for expand/collapse
-            $className                                        = ( $i <= $this->conf[ 'expandLevels' ] ) ? 'open'                         : 'closed';
-            
+            // Checks for Scriptaculous
+            if( isset( $this->conf[ 'scriptaculous.' ][ 'enable' ] )
+                && $this->conf[ 'scriptaculous.' ][ 'enable' ]
+            ) {
+                
+                // No CSS class
+                $className = '';
+                
+                // CSS styles name for expand/collapse
+                $styles    = ( $i - 1 <= $this->conf[ 'expandLevels' ] ) ? ' style="display: block;"' : ' style="display: none;"';
+                
+            } else {
+                
+                // CSS class name for expand/collapse
+                $className = ( $i <= $this->conf[ 'expandLevels' ] )     ? ' class="open"'            : ' class="closed"';
+                
+                // No CSS styles
+                $styles    = '';
+            }
             // TMENU object
             $mconf[ $i ]                                      = 'TMENU';
             
             // Wrap in an HTML list element
-            $mconf[ $i . '.' ][ 'wrap' ]                      = '<' . $this->conf[ 'list.']['tag' ]
+            $mconf[ $i . '.' ][ 'wrap' ]                      = '<'
+                                                              . $this->conf[ 'list.' ][ 'tag' ]
                                                               . ' type="'
                                                               . $this->conf[ 'list.' ][ 'type' ]
-                                                              . '">|</'
+                                                              . '"'
+                                                              . $styles
+                                                              . '>|</'
                                                               . $this->conf[ 'list.' ][ 'tag' ]
                                                               . '>';
             
@@ -274,6 +344,13 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
                                                               . '">'
                                                               . $this->cObj->IMAGE( $imgTSConfig[ 'NO' ] )
                                                               . '<span class="no">|</span>';
+            
+            // Checks for a specific link text
+            if( $this->conf[ 'linkText' ] ) {
+                
+                // Forces the link text
+                $mconf[ $i . '.' ][ 'NO.' ][ 'stdWrap.' ][ 'field' ] = $this->conf[ 'linkText' ];
+            }
             
             // Check if A tag title must be added
             if( $this->conf[ 'titleFields' ] ) {
@@ -306,18 +383,43 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
                 // Start wrap
                 $mconf[ $i . '.' ][ 'IFSUB.' ][ 'allWrap' ]          = '<li id="'
                                                                      . $this->prefixId
-                                                                     . '_{elementUid}" class="'
+                                                                     . '_{elementUid}"'
                                                                      . $className
-                                                                     . '"><div class="level_'
+                                                                     . '><div class="level_'
                                                                      . $i
                                                                      . '"><a href="javascript:'
                                                                      . $this->prefixId
-                                                                     . '_swapClasses({elementUid});">'
+                                                                     . '_swapClasses({elementUid});" title="'
+                                                                     . $this->pi_getLL( 'title-ifsub' )
+                                                                     . '">'
                                                                      . $this->cObj->IMAGE( $imgTSConfig[ 'IFSUB' ] )
                                                                      . '</a><span class="ifsub">|</span>';
                 
                 // IFSUB state activation
                 $mconf[ $i . '.' ][ 'IFSUB' ]                        = '1';
+                
+                // Checks for a specific link text
+                if( $this->conf[ 'linkText' ] ) {
+                    
+                    // Forces the link text
+                    $mconf[ $i . '.' ][ 'IFSUB.' ][ 'stdWrap.' ][ 'field' ] = $this->conf[ 'linkText' ];
+                }
+                
+                // Check if A tag title must be added
+                if( $this->conf[ 'titleFields' ] ) {
+                    
+                    // Add fields for A tag
+                    $mconf[ $i . '.' ][ 'IFSUB.' ][ 'ATagTitle.' ][ 'field' ] = $this->conf[ 'titleFields' ];
+                }
+                
+                // Check if a description must be added
+                if( $this->conf[ 'descriptionField' ] && $this->conf[ 'descriptionField' ] != 'none' ) {
+                    
+                    // Add description
+                    $mconf[ $i . '.' ][ 'IFSUB.' ][ 'after.' ][ 'dataWrap' ] = '|<span class="description">&nbsp;{field:'
+                                                                             . $this->conf[ 'descriptionField' ]
+                                                                             . '}</span>';
+                }
             }
             
             // Configuration for spacers
@@ -333,8 +435,15 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
                 $mconf[ $i . '.' ][ 'SPC.' ][ 'allWrap' ]        = '<li class="closed"><div class="level_'
                                                                  . $i
                                                                  . '">'
-                                                                 . $this->cObj->IMAGE( $imgTSConfig[ 'NO' ] )
+                                                                 . $this->cObj->IMAGE( $imgTSConfig[ 'SPC' ] )
                                                                  . '<span class="spc">|</span>';
+                
+                // Checks for a specific link text
+                if( $this->conf[ 'linkText' ] ) {
+                    
+                    // Forces the link text
+                    $mconf[ $i . '.' ][ 'SPC.' ][ 'stdWrap.' ][ 'field' ] = $this->conf[ 'linkText' ];
+                }
             }
         }
         
@@ -351,14 +460,13 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
      * @param       $expanded           Boolean - True if the menu should be expanded
      * @return      The configuration arrays for the pictures.
      */
-    function buildImageTSConfig($expanded=false)
+    function buildImageTSConfig( $expanded = false )
     {
-        
         // Image TS Config array for NO state
         $imgTSConfigNo                        = array();
         
         // File reference
-        $imgTSConfigNo[ 'file' ]              = 'EXT:' . $this->extKey . '/pi1/spacer.gif';
+        $imgTSConfigNo[ 'file' ]              = $this->conf[ 'picture.' ][ 'page' ];
         
         // File ressource array
         $imgTSConfigNo[ 'file.' ]             = array();
@@ -371,6 +479,12 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         
         // HTML tag parameters
         $imgTSConfigNo[ 'params' ]            = $this->conf[ 'picture.' ][ 'params' ];
+        
+        // Image TS Config array for SPC state
+        $imgTSConfigSpc                       = $imgTSConfigNo;
+        
+        // File reference
+        $imgTSConfigSpc[ 'file' ]             = $this->conf[ 'picture.' ][ 'spacer' ];
         
         // Image TS Config array for IFSUB state
         $imgTSConfigSub                       = $imgTSConfigNo;
@@ -386,7 +500,18 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         $imgTSConfig = array(
             'NO'    => $imgTSConfigNo,
             'IFSUB' => $imgTSConfigSub,
+            'SPC'   => $imgTSConfigSpc
         );
+        
+        // Add alt texts
+        $imgTSConfig[ 'NO' ][ 'altText' ]    = $this->pi_getLL( 'alt-no' );
+        $imgTSConfig[ 'IFSUB' ][ 'altText' ] = $this->pi_getLL( 'alt-ifsub' );
+        $imgTSConfig[ 'SPC' ][ 'altText' ]   = $this->pi_getLL( 'alt-spc' );
+        
+        // Add title texts
+        $imgTSConfig[ 'NO' ][ 'titleText' ]    = $this->pi_getLL( 'title-no' );
+        $imgTSConfig[ 'IFSUB' ][ 'titleText' ] = $this->pi_getLL( 'title-ifsub' );
+        $imgTSConfig[ 'SPC' ][ 'titleText' ]   = $this->pi_getLL( 'title-spc' );
         
         // Return array
         return $imgTSConfig;
@@ -402,7 +527,6 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
      */
     function buildJSCode() 
     {
-        
         // Storage
         $jsCode      = array();
         
@@ -424,32 +548,107 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
             )
         );
         
-        // Function for swappingelement class
-        $jsCode[] = 'function ' . $this->prefixId . '_swapClasses(element) {';
-        $jsCode[] = '	if (document.getElementById) {';
-        $jsCode[] = '		var liClass = "' . $this->prefixId . '_" + element;';
-        $jsCode[] = '		var picture = "pic_" + element;';
-        $jsCode[] = '		document.getElementById(liClass).className = (document.getElementById(liClass).className == "open") ? "closed" : "open";';
-        $jsCode[] = '		document.getElementById(picture).src = (document.getElementById(liClass).className == "open") ? "' . $minusImgURL . '" : "' . $plusImgURL . '";';
-        $jsCode[] = '	}';
-        $jsCode[] = '}';
+        // Expand all image URL
+        $expOn = str_replace(
+            PATH_site,
+            '',
+            t3lib_div::getFileAbsFileName(
+                $this->conf[ 'picture.' ][ 'expOn' ]
+            )
+        );
         
-        // Function for expanding/collapsing all elements
-        $jsCode[] = 'var expanded = 0;';
-        $jsCode[] = 'function ' . $this->prefixId . '_expAll() {';
-        $jsCode[] = '	if (document.getElementsByTagName) {';
-        $jsCode[] = '		var listItems = document.getElementsByTagName("li");';
-        $jsCode[] = '		for (i = 0; i < listItems.length; i++) {';
-        $jsCode[] = '			if (listItems[i].id.indexOf("' . $this->prefixId . '") != -1) {';
-        $jsCode[] = '				listItems[i].className = (expanded) ? "closed" : "open";';
-        $jsCode[] = '				var picture = "pic_" + listItems[i].id.replace("' . $this->prefixId . '_","");';
-        $jsCode[] = '				listItems[i].className = (expanded) ? "closed" : "open"';
-        $jsCode[] = '				document.getElementById(picture).src = (expanded) ? "' . $plusImgURL . '" : "' . $minusImgURL . '";';
-        $jsCode[] = '			}';
-        $jsCode[] = '		}';
-        $jsCode[] = '	expanded = (expanded == 1) ? 0 : 1;';
-        $jsCode[] = '	}';
-        $jsCode[] = '}';
+        // Collapse all image URL
+        $expOff = str_replace(
+            PATH_site,
+            '',
+            t3lib_div::getFileAbsFileName(
+                $this->conf[ 'picture.' ][ 'expOff' ]
+            )
+        );
+        
+        // Checks for Scriptaculous
+        if( isset( $this->conf[ 'scriptaculous.' ][ 'enable' ] )
+            && $this->conf[ 'scriptaculous.' ][ 'enable' ]
+        ) {
+            
+            // Effects
+            $appear = $this->conf[ 'scriptaculous.' ][ 'appear' ];
+            $fade   = $this->conf[ 'scriptaculous.' ][ 'fade' ];
+            
+            // Function for swapping element class
+            $jsCode[] = 'function ' . $this->prefixId . '_swapClasses( element )';
+            $jsCode[] = '{';
+            $jsCode[] = '    var listItem    = document.getElementById( "' . $this->prefixId . '_" + element );';
+            $jsCode[] = '    var descendants = listItem.firstDescendant().immediateDescendants();';
+            $jsCode[] = '    var list        = descendants[ descendants.length - 1 ];';
+            $jsCode[] = '    var picture     = "pic_" + element;';
+            $jsCode[] = '    if( list.getStyle( "display" ) == "none" ) {';
+            $jsCode[] = '        Effect.' . $appear . '( list );';
+            $jsCode[] = '        document.getElementById( picture ).src = "' . $minusImgURL . '";';
+            $jsCode[] = '    } else {';
+            $jsCode[] = '        Effect.' . $fade . '( list );';
+            $jsCode[] = '        document.getElementById( picture ).src = "' . $plusImgURL . '";';
+            $jsCode[] = '    }';
+            $jsCode[] = '}';
+            
+            // Function for expanding/collapsing all elements
+            $jsCode[] = 'var ' . $this->prefixId . '_expanded = 0;';
+            $jsCode[] = 'function ' . $this->prefixId . '_expAll()';
+            $jsCode[] = '{';
+            $jsCode[] = '    if( document.getElementsByTagName ) {';
+            $jsCode[] = '        var style     = ( ' . $this->prefixId . '_expanded ) ? "none" : "block";';
+            $jsCode[] = '        var listItems = document.getElementsByTagName( "li" );';
+            $jsCode[] = '        for( i = 0; i < listItems.length; i++ ) {';
+            $jsCode[] = '            if( listItems[ i ].id.indexOf( "' . $this->prefixId . '" ) != -1 ) {';
+            $jsCode[] = '                var descendants = listItems[ i ].firstDescendant().immediateDescendants();';
+            $jsCode[] = '                var list        = descendants[ descendants.length - 1 ];';
+            $jsCode[] = '                var picture     = "pic_" + listItems[ i ].id.replace( "' . $this->prefixId . '_", "" );';
+            $jsCode[] = '                if( ' . $this->prefixId . '_expanded && list.getStyle( "display" ) == "block" ) {';
+            $jsCode[] = '                    Effect.' . $fade . '( list );';
+            $jsCode[] = '                    document.getElementById( picture ).src = "' . $plusImgURL . '";';
+            $jsCode[] = '                } else if( list.getStyle( "display" ) == "none" ) {';
+            $jsCode[] = '                    Effect.' . $appear . '( list );';
+            $jsCode[] = '                    document.getElementById( picture ).src = "' . $minusImgURL . '";';
+            $jsCode[] = '                }';
+            $jsCode[] = '            }';
+            $jsCode[] = '        }';
+            $jsCode[] = '        document.getElementById( "' . $this->prefixId . '_expImg" ).src = ( ' . $this->prefixId . '_expanded == 1 ) ? "' . $expOn . '" : "' . $expOff . '"';
+            $jsCode[] = '        ' . $this->prefixId . '_expanded                                = ( ' . $this->prefixId . '_expanded == 1 ) ? 0 : 1;';
+            $jsCode[] = '    }';
+            $jsCode[] = '}';
+            
+        } else {
+            
+            // Function for swapping element class
+            $jsCode[] = 'function ' . $this->prefixId . '_swapClasses( element )';
+            $jsCode[] = '{';
+            $jsCode[] = '    if( document.getElementById ) {';
+            $jsCode[] = '        var liClass                                  = "' . $this->prefixId . '_" + element;';
+            $jsCode[] = '        var picture                                  = "pic_" + element;';
+            $jsCode[] = '        document.getElementById( liClass ).className = ( document.getElementById( liClass ).className == "open" ) ? "closed" : "open";';
+            $jsCode[] = '        document.getElementById( picture ).src       = ( document.getElementById( liClass ).className == "open" ) ? "' . $minusImgURL . '" : "' . $plusImgURL . '";';
+            $jsCode[] = '    }';
+            $jsCode[] = '}';
+            
+            // Function for expanding/collapsing all elements
+            $jsCode[] = 'var ' . $this->prefixId . '_expanded = 0;';
+            $jsCode[] = 'function ' . $this->prefixId . '_expAll()';
+            $jsCode[] = '{';
+            $jsCode[] = '    if( document.getElementsByTagName ) {';
+            $jsCode[] = '        var listItems = document.getElementsByTagName( "li" );';
+            $jsCode[] = '        for( i = 0; i < listItems.length; i++ ) {';
+            $jsCode[] = '            if( listItems[ i ].id.indexOf( "' . $this->prefixId . '" ) != -1 ) {';
+            $jsCode[] = '                listItems[ i ].className               = ( ' . $this->prefixId . '_expanded ) ? "closed" : "open";';
+            $jsCode[] = '                var picture                            = "pic_" + listItems[ i ].id.replace( "' . $this->prefixId . '_", "" );';
+            $jsCode[] = '                listItems[ i ].className               = ( ' . $this->prefixId . '_expanded ) ? "closed" : "open"';
+            $jsCode[] = '                document.getElementById( picture ).src = ( ' . $this->prefixId . '_expanded ) ? "' . $plusImgURL . '" : "' . $minusImgURL . '";';
+            $jsCode[] = '            }';
+            $jsCode[] = '        }';
+            $jsCode[] = '        document.getElementById( "' . $this->prefixId . '_expImg" ).src = ( ' . $this->prefixId . '_expanded == 1 ) ? "' . $expOn . '" : "' . $expOff . '"';
+            $jsCode[] = '        ' . $this->prefixId . '_expanded                                = ( ' . $this->prefixId . '_expanded == 1 ) ? 0 : 1;';
+            $jsCode[] = '    }';
+            $jsCode[] = '}';
+        }
         
         // Adds JS code
         $GLOBALS[ 'TSFE' ]->setJS(
