@@ -25,7 +25,7 @@
 	/**
 	 * Plugin 'Drop-Down sitemap' for the 'dropdown_sitemap' extension.
 	 *
-	 * @author		Jean-David Gadina (macmade@gadlab.net)
+	 * @author		Jean-David Gadina (info@macmade.net)
 	 * @version		1.2.0
 	 */
 	
@@ -165,6 +165,8 @@
 			$flex2conf = array(
 				'startingPoint' => 'sDEF:pages',
 				'excludeList' => 'sOPTIONS:exclude_pages',
+				'excludeDoktypes' => 'sOPTIONS:exclude_doktypes',
+				'includeNotInMenu' => 'sOPTIONS:include_not_in_menu',
 				'expAllLink' => 'sOPTIONS:expall',
 				'showLevels' => 'sOPTIONS:show_levels',
 				'expandLevels' => 'sOPTIONS:expand_levels',
@@ -200,6 +202,12 @@
 			
 			// Exclude pages
 			$mconf['excludeUidList'] = $this->conf['excludeList'];
+			
+			// Exclude page types
+			$mconf['excludeDoktypes'] = $this->conf['excludeDoktypes'];
+			
+			// Include not in menu
+			$mconf['includeNotInMenu'] = $this->conf['includeNotInMenu'];
 			
 			// Creating menu items configuration
 			for ($i = 1; $i < ($this->conf['showLevels'] + 1); $i++) {

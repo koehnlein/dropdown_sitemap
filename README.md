@@ -1,17 +1,16 @@
 # TYPO3 Extension "dropdown_sitemap"
 The Drop-Down sitemap plugin adds a new kind of menu/sitemap to the T3 content elements. It uses HTML list elements, CSS and JS (Scriptaculous or Mootools) to generate a drop-down map of the website, with the possibility to expand/collapse every section.
 
-## Version 1.2.0
+## Version 1.3.0
 
 
 
 
 <table>
-	<tr><td>Version</td><td>1.2.0 stable</td></tr>
-	<tr><td>Release date</td><td>16. June 2005</td></tr>
+	<tr><td>Version</td><td>1.3.0 stable</td></tr>
+	<tr><td>Release date</td><td>30. May 2007</td></tr>
 	<tr><td>Author</td><td>Jean-David Gadina</td></tr>
-	<tr><td>Comment</td><td>Now with FlexForm configuration.
-Please read the manual if youre updating from an older version.</td></tr>
+	<tr><td>Comment</td><td>Added options to exclude doktypes and include pages marked as not in menu.</td></tr>
 </table>
 
 ## !! Attention !!

@@ -36,6 +36,12 @@ plugin.tx_dropdownsitemap_pi1 {
 	// Exclude list
 	excludeList = {$plugin.tx_dropdownsitemap_pi1.excludeList}
 	
+	// Exclude page types
+	excludeDoktypes = {$plugin.tx_dropdownsitemap_pi1.excludeDokTypes}
+	
+	// Include not in menu pages
+	includeNotInMenu = {$plugin.tx_dropdownsitemap_pi1.includeNotInMenu}
+	
 	// Add the expand/collapse all link
 	expAllLink = {$plugin.tx_dropdownsitemap_pi1.expAllLink}
 	

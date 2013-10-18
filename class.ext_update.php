@@ -25,7 +25,7 @@
 	/**
 	 * Class/Function for updating the extension from older versions.
 	 *
-	 * @author		Jean-David Gadina (macmade@gadlab.net)
+	 * @author		Jean-David Gadina (info@macmade.net)
 	 * @version		1.0
 	 */
 	
