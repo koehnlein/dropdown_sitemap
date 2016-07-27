@@ -32,7 +32,7 @@
 /**
  * [CLASS/FUNCTION INDEX OF SCRIPT]
  * 
- *   52:    class tx_dropdownsitemap_pi1 extends tslib_pibase
+ *   52:    class tx_dropdownsitemap_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
  *   86:    public function __construct
  *  104:    protected function _setConfig
  *  149:    protected function _buildMenuConfArray
@@ -44,9 +44,9 @@
  */
 
 // Developer API class
-require_once( t3lib_extMgm::extPath( 'api_macmade' ) . 'class.tx_apimacmade.php' );
+require_once( \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath( 'api_macmade' ) . 'class.tx_apimacmade.php' );
 
-class tx_dropdownsitemap_pi1 extends tslib_pibase
+class tx_dropdownsitemap_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 {
     // TypoScript configuration array
     protected $_conf           = array();
@@ -142,7 +142,7 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
      * Create MENU object configuration
      * 
      * This function creates the configuration array of the sitemap,
-     * which will be used by the start() method of the tslib_tmenu class.
+     * which will be used by the start() method of the \TYPO3\CMS\Frontend\ContentObject\Menu\TextMenuContentObject class.
      * 
      * @return  array   The configuration array of the menu
      */
@@ -427,7 +427,7 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         $plusImgURL  = str_replace(
             PATH_site,
             '',
-            t3lib_div::getFileAbsFileName(
+            \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName(
                 $this->_conf[ 'picture.' ][ 'expand' ]
             )
         );
@@ -436,7 +436,7 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         $minusImgURL = str_replace(
             PATH_site,
             '',
-            t3lib_div::getFileAbsFileName(
+            \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName(
                 $this->_conf[ 'picture.' ][ 'collapse' ]
             )
         );
@@ -445,7 +445,7 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         $expOn = str_replace(
             PATH_site,
             '',
-            t3lib_div::getFileAbsFileName(
+            \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName(
                 $this->_conf[ 'picture.' ][ 'expOn' ]
             )
         );
@@ -454,7 +454,7 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         $expOff = str_replace(
             PATH_site,
             '',
-            t3lib_div::getFileAbsFileName(
+            \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName(
                 $this->_conf[ 'picture.' ][ 'expOff' ]
             )
         );
@@ -666,8 +666,8 @@ class tx_dropdownsitemap_pi1 extends tslib_pibase
         // Add JavaScrip Code
         $this->_buildJSCode();
         
-        // New instance of the tslib_tmenu class
-        $menu              = t3lib_div::makeInstance( 'tslib_tmenu' );
+        // New instance of the \TYPO3\CMS\Frontend\ContentObject\Menu\TextMenuContentObject class
+        $menu              = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( 'TYPO3\\CMS\\Frontend\\ContentObject\Menu\\TextMenuContentObject' );
         
         // Set some internal vars
         $menu->parent_cObj = $this->cObj;

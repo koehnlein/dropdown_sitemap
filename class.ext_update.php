@@ -122,7 +122,7 @@ class ext_update
     public function main()
     {
         // New instance of the document class
-        $this->_doc  = t3lib_div::makeInstance( 'bigDoc' );
+        $this->_doc  = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( 'bigDoc' );
         
         // Select records
         $res         = $this->_selectOldRecords();
@@ -138,13 +138,13 @@ class ext_update
         
         // Start form
         $htmlCode[]  = '<form action="'
-                     . t3lib_div::linkThisScript()
+                     . \TYPO3\CMS\Core\Utility\GeneralUtility::linkThisScript()
                      . '" method="post" enctype="'
                      . $GLOBALS[ 'TYPO3_CONF_VARS' ][ 'SYS' ][ 'form_enctype' ]
                      . '">';
         
         // Check action
-        if ( t3lib_div::_GP( 'update' ) ) {
+        if ( \TYPO3\CMS\Core\Utility\GeneralUtility::_GP( 'update' ) ) {
             
             // Infos
             $htmlCode[] = '<p><img '
@@ -239,12 +239,12 @@ class ext_update
                         . ' record(s) affected)">';
             
             // GET variables
-            $CMD = t3lib_div::_GP( 'CMD' );
-            $SET = t3lib_div::_GP( 'SET' );
+            $CMD = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP( 'CMD' );
+            $SET = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP( 'SET' );
             
             // Hidden inputs to preserve GET variables
             $htmlCode[] = '<input name="id" type="hidden" value="'
-                        . t3lib_div::_GP( 'id' )
+                        . \TYPO3\CMS\Core\Utility\GeneralUtility::_GP( 'id' )
                         . '">';
             $htmlCode[] = '<input name="CMD[showExt]" type="hidden" value="'
                         . $CMD[ 'showExt' ]

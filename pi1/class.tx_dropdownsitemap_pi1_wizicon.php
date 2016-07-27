@@ -98,7 +98,7 @@ class tx_dropdownsitemap_pi1_wizicon
         $wizardItems[ 'plugins_' . self::$_piName . '_pi1' ] = array(
             
             // Icon
-            'icon'        => t3lib_extMgm::extRelPath( self::$_extKey ) . 'pi1/ce_wiz.gif',
+            'icon'        => 'EXT:' . self::$_extKey . '/pi1/ce_wiz.gif',
             
             // Title
             'title'       => $this->_getLabel( 'pi1_title' ),
